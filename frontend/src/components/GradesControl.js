@@ -8,8 +8,6 @@ export default function GradesControl({grades, onDelete, onPersist}) {
   let currentSubject = grades[0].subject;
   let currentGrades = [];
   let id = 1;
-
-  console.log(tableGrades)
   
   grades.forEach((grade)   => {
     if(grade.subject !== currentSubject) {
@@ -38,13 +36,23 @@ export default function GradesControl({grades, onDelete, onPersist}) {
   });
 
   const handleActionClick = (id, type) => {
-    console.log(type)
-    console.log(id)
+    const grade = grades.find(grade => grade.id === id);
+    if(type === 'deleted') {
+      onDelete(grade);
+      return;
+    }
+
+    onPersist(grade);
   }
 
+  
   return (
     <div>
-      {tableGrades.map(({id, grades}) => (
+      {tableGrades.map(({id, grades}) => {
+        const finalGrade = grades.reduce((acc, curr) => acc + curr.value, 0);
+        const gradeStyle = finalGrade >= 70 ? styles.goodGrade : styles.badGrade;
+        
+      return(
         <table key={id}>
           <thead>
             <tr>
@@ -72,8 +80,29 @@ export default function GradesControl({grades, onDelete, onPersist}) {
               )
             })}
           </tbody>
+          <tfoot>
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td><strong>Total</strong></td>
+              <td><span style={gradeStyle}>{finalGrade}</span></td>
+            </tr>
+          </tfoot>
         </table>
-      ))}
+      )})}
     </div>
   )
+}
+
+const styles = {
+  goodGrade: {
+    fontWeight: 'bold',
+    color: 'green',
+  },
+
+  badGrade: {
+    fontWeight: 'bold',
+    color: 'red',
+  }
 }
